@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DataPardy — Audience</title>
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    body { margin: 0; overflow: hidden; }
+    body::before { display: none; } /* hide cheetah spots on audience bg */
+  </style>
+</head>
+<body>
+  <div class="audience-root">
+
+    <!-- Waiting for host -->
+    <div class="audience-scene active" id="scene-waiting">
+      <div class="audience-waiting">
+        <div style="font-family:var(--font-main);font-size:2rem;color:var(--gold);letter-spacing:3px">
+          DataPardy
+        </div>
+        <div>Waiting for host to start the game&hellip;</div>
+        <div class="dot-pulse">◆</div>
+      </div>
+    </div>
+
+    <!-- Board -->
+    <div class="audience-scene" id="scene-board">
+      <div class="audience-board-wrap">
+        <div class="audience-board" id="audienceBoard"></div>
+      </div>
+      <div class="audience-score-strip" id="audienceScoreStrip"></div>
+    </div>
+
+    <!-- Daily Double -->
+    <div class="audience-scene" id="scene-daily-double">
+      <div class="audience-dd-scene">
+        <div class="audience-dd-text">Daily Double!</div>
+        <div class="audience-dd-sub" id="ddMeta"></div>
+      </div>
+    </div>
+
+    <!-- Question -->
+    <div class="audience-scene" id="scene-question">
+      <div class="audience-question-scene">
+        <div class="audience-meta" id="qMeta"></div>
+        <img id="qImage" class="audience-image hidden" alt="">
+        <div class="audience-question-text" id="qText"></div>
+      </div>
+      <div class="audience-score-strip" id="audienceScoreStripQ"></div>
+    </div>
+
+    <!-- Answer -->
+    <div class="audience-scene" id="scene-answer">
+      <div class="audience-question-scene">
+        <div class="audience-meta" id="aMeta"></div>
+        <img id="aImage" class="audience-image hidden" alt="">
+        <div class="audience-question-text" id="aText"></div>
+        <div class="audience-answer-box" id="aAnswer"></div>
+      </div>
+      <div class="audience-score-strip" id="audienceScoreStripA"></div>
+    </div>
+
+    <!-- Final Jeopardy: wager stage -->
+    <div class="audience-scene" id="scene-final-wager">
+      <div class="audience-final-wager-scene">
+        <div class="audience-fj-label">Final Jeopardy</div>
+        <div class="audience-fj-category" id="fjWagerCategory"></div>
+        <div style="margin-top:24px;color:var(--tan);font-size:0.9rem">Make your wagers now</div>
+      </div>
+    </div>
+
+    <!-- Final Jeopardy: question -->
+    <div class="audience-scene" id="scene-final-question">
+      <div class="audience-question-scene">
+        <div class="audience-fj-label">Final Jeopardy</div>
+        <div class="audience-fj-category" id="fjQCategory" style="font-size:1.4rem;margin-bottom:28px"></div>
+        <img id="fjQImage" class="audience-image hidden" alt="">
+        <div class="audience-question-text" id="fjQText"></div>
+      </div>
+    </div>
+
+    <!-- Final Jeopardy: answer + scores -->
+    <div class="audience-scene" id="scene-final-answer">
+      <div class="audience-question-scene" style="padding-bottom:16px">
+        <div class="audience-fj-label">Final Jeopardy</div>
+        <div class="audience-fj-category" id="fjACategory" style="font-size:1.2rem;margin-bottom:16px"></div>
+        <img id="fjAImage" class="audience-image hidden" alt="">
+        <div class="audience-question-text" id="fjAText" style="font-size:clamp(1rem,2.5vw,1.8rem)"></div>
+        <div class="audience-answer-box" id="fjAAnswer" style="margin-bottom:0"></div>
+        <div class="audience-final-scores" id="fjScores"></div>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="js/audience.js"></script>
+</body>
+</html>

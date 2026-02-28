@@ -892,3 +892,250 @@ body > * {
 ::-webkit-scrollbar { width: 6px; }
 ::-webkit-scrollbar-track { background: rgba(0,0,0,0.3); }
 ::-webkit-scrollbar-thumb { background: rgba(200,124,10,0.5); border-radius: 3px; }
+
+/* ===== AUDIENCE VIEW ===== */
+.audience-root {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+  background: var(--black);
+}
+
+/* Scene containers — only .active is shown */
+.audience-scene {
+  display: none;
+  flex: 1;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.audience-scene.active {
+  display: flex;
+}
+
+/* Board scene */
+.audience-board-wrap {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 8px 8px 0;
+  overflow: hidden;
+}
+
+.audience-board {
+  display: grid;
+  gap: 5px;
+  flex: 1;
+}
+
+.audience-board .board-cell.value-cell {
+  font-size: 2.2rem;
+  min-height: 0;
+}
+
+.audience-board .board-cell.category-header-cell {
+  font-size: 0.85rem;
+  min-height: 0;
+}
+
+/* Score strip at bottom of board scene */
+.audience-score-strip {
+  display: flex;
+  justify-content: center;
+  gap: 0;
+  background: linear-gradient(90deg, #0d0d0d, #1c1208, #0d0d0d);
+  border-top: 2px solid var(--amber);
+  padding: 6px 10px;
+  flex-shrink: 0;
+}
+
+.audience-score-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 4px 18px;
+  border-right: 1px solid rgba(200,124,10,0.25);
+}
+
+.audience-score-item:last-child {
+  border-right: none;
+}
+
+.audience-score-name {
+  font-size: 0.7rem;
+  color: var(--tan);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  white-space: nowrap;
+}
+
+.audience-score-val {
+  font-family: var(--font-main);
+  font-size: 1.4rem;
+  color: var(--gold-bright);
+}
+
+.audience-score-val.negative {
+  color: var(--red);
+}
+
+/* Question / Answer scene */
+.audience-question-scene {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  text-align: center;
+  overflow: auto;
+}
+
+.audience-meta {
+  font-size: 0.8rem;
+  color: var(--tan);
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  margin-bottom: 12px;
+}
+
+.audience-question-text {
+  font-size: clamp(1.6rem, 4vw, 3rem);
+  line-height: 1.4;
+  color: var(--cream);
+  margin-bottom: 28px;
+  max-width: 900px;
+}
+
+.audience-image {
+  max-width: 70%;
+  max-height: 38vh;
+  object-fit: contain;
+  border-radius: 10px;
+  border: 2px solid rgba(200,124,10,0.4);
+  margin-bottom: 28px;
+}
+
+.audience-answer-box {
+  background: rgba(10,6,0,0.8);
+  border: 3px solid var(--gold-bright);
+  border-radius: 12px;
+  padding: 20px 40px;
+  font-size: clamp(1.2rem, 3vw, 2rem);
+  color: var(--gold-bright);
+  max-width: 800px;
+  width: 100%;
+  animation: slideUp 0.3s ease;
+}
+
+/* Daily Double scene */
+.audience-dd-scene {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.audience-dd-text {
+  font-family: var(--font-main);
+  font-size: clamp(3rem, 10vw, 7rem);
+  color: var(--gold-bright);
+  letter-spacing: 6px;
+  text-transform: uppercase;
+  animation: pulse 1.2s ease-in-out infinite;
+  text-shadow: 0 0 40px rgba(255,215,0,0.8), 0 0 80px rgba(255,215,0,0.4);
+}
+
+.audience-dd-sub {
+  font-family: var(--font-main);
+  font-size: 1.4rem;
+  color: var(--tan);
+  margin-top: 16px;
+  letter-spacing: 2px;
+}
+
+/* Final Jeopardy wager scene */
+.audience-final-wager-scene {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.audience-fj-label {
+  font-family: var(--font-main);
+  font-size: 1rem;
+  color: var(--tan);
+  text-transform: uppercase;
+  letter-spacing: 4px;
+  margin-bottom: 16px;
+}
+
+.audience-fj-category {
+  font-family: var(--font-main);
+  font-size: clamp(2rem, 6vw, 4.5rem);
+  color: var(--gold-bright);
+  text-shadow: 0 0 30px rgba(255,215,0,0.5);
+  letter-spacing: 3px;
+  max-width: 900px;
+}
+
+/* Final answer scene player scores */
+.audience-final-scores {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 24px;
+  padding: 0 20px;
+}
+
+.audience-final-score-card {
+  background: rgba(20,12,0,0.7);
+  border: 2px solid rgba(200,124,10,0.4);
+  border-radius: 12px;
+  padding: 14px 24px;
+  text-align: center;
+  min-width: 150px;
+}
+
+.audience-final-score-card .player-name {
+  font-size: 0.8rem;
+  color: var(--tan);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 6px;
+}
+
+.audience-final-score-card .player-score {
+  font-family: var(--font-main);
+  font-size: 1.8rem;
+  color: var(--gold-bright);
+}
+
+.audience-final-score-card .player-score.negative {
+  color: var(--red);
+}
+
+.audience-waiting {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 16px;
+  color: var(--tan);
+  font-size: 1rem;
+  text-align: center;
+}
+
+.audience-waiting .dot-pulse {
+  font-size: 2rem;
+  color: var(--amber);
+  animation: pulse 1.5s ease-in-out infinite;
+}

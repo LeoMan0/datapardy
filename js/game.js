@@ -1,3 +1,20 @@
+// ===== BROADCAST CHANNEL =====
+const channel = new BroadcastChannel('datapardy');
+let currentScene = null;
+
+function broadcast(scene) {
+  currentScene = scene;
+  channel.postMessage({ type: 'scene', scene });
+}
+
+// Respond to sync requests from audience window
+channel.onmessage = (e) => {
+  if (e.data.type === 'sync_request') {
+    if (currentScene) broadcast(currentScene);
+    else if (gameData) broadcast({ view: 'board', game: gameData });
+  }
+};
+
 // ===== STATE =====
 let gameData = null;
 let currentQuestion = null; // { ci, qi, q }
@@ -23,6 +40,7 @@ window.addEventListener('DOMContentLoaded', () => {
   document.getElementById('gameTitle').textContent = gameData.title || 'DataPardy';
   renderBoard();
   renderScores();
+  broadcast({ view: 'board', game: gameData });
 });
 
 document.addEventListener('keydown', e => {
@@ -33,11 +51,8 @@ document.addEventListener('keydown', e => {
 function renderBoard() {
   const board = document.getElementById('board');
   const cats = gameData.categories;
-  const numCols = cats.length;
-  const numRows = Math.max(...cats.map(c => c.questions.length)) + 1; // +1 for header
 
-  board.style.gridTemplateColumns = `repeat(${numCols}, 1fr)`;
-
+  board.style.gridTemplateColumns = `repeat(${cats.length}, 1fr)`;
   board.innerHTML = '';
 
   // Row 0: category headers
@@ -48,7 +63,7 @@ function renderBoard() {
     board.appendChild(cell);
   });
 
-  // Rows 1..n: questions
+  // Question rows
   const maxQ = Math.max(...cats.map(c => c.questions.length));
   for (let qi = 0; qi < maxQ; qi++) {
     cats.forEach((cat, ci) => {
@@ -107,8 +122,11 @@ function adjustScore(playerIndex, delta) {
   gameData.players[playerIndex].score += delta;
   saveState();
   updateScoreDisplay(playerIndex);
-  // Also refresh score buttons in modal if open
   renderModalScoreButtons();
+  // Re-broadcast current scene with updated game state so audience scores update
+  if (currentScene) {
+    broadcast({ ...currentScene, game: gameData });
+  }
 }
 
 // ===== MODAL =====
@@ -128,20 +146,19 @@ function openQuestion(ci, qi) {
   document.getElementById('revealAnswerBtn').classList.remove('hidden');
 
   if (q.isDailyDouble) {
-    showDDSection();
+    showDDSection(cat.name, q.points);
   } else {
-    showQuestionSection(q);
+    showQuestionSection(q, cat.name);
   }
 
   document.getElementById('modalOverlay').classList.remove('hidden');
   document.getElementById('modal').scrollTop = 0;
 }
 
-function showDDSection() {
+function showDDSection(categoryName, points) {
   document.getElementById('modalDDSection').classList.remove('hidden');
   document.getElementById('modalQuestionSection').classList.add('hidden');
 
-  // Populate player select
   const sel = document.getElementById('ddPlayerSelect');
   sel.innerHTML = '';
   gameData.players.forEach((p, i) => {
@@ -150,9 +167,9 @@ function showDDSection() {
     opt.textContent = p.name + ' (' + formatScore(p.score) + ')';
     sel.appendChild(opt);
   });
-
-  // Set max wager hint
   document.getElementById('ddWagerAmount').value = '';
+
+  broadcast({ view: 'daily_double', category: categoryName, points });
 }
 
 function confirmDDWager() {
@@ -165,10 +182,10 @@ function confirmDDWager() {
   currentDDPlayerIndex = playerIndex;
   currentDDWager = wager;
   document.getElementById('modalPoints').textContent = 'DAILY DOUBLE — Wager: $' + wager;
-  showQuestionSection(currentQuestion.q);
+  showQuestionSection(currentQuestion.q, gameData.categories[currentQuestion.ci].name);
 }
 
-function showQuestionSection(q) {
+function showQuestionSection(q, categoryName) {
   document.getElementById('modalDDSection').classList.add('hidden');
   document.getElementById('modalQuestionSection').classList.remove('hidden');
 
@@ -183,6 +200,17 @@ function showQuestionSection(q) {
 
   document.getElementById('modalQuestion').textContent = q.question || '(no question text)';
   renderModalScoreButtons();
+
+  broadcast({
+    view: 'question',
+    category: categoryName || '',
+    points: q.points,
+    question: q.question || '',
+    image: q.image || null,
+    isDailyDouble: q.isDailyDouble,
+    wager: currentDDWager,
+    game: gameData
+  });
 }
 
 function renderModalScoreButtons() {
@@ -195,7 +223,6 @@ function renderModalScoreButtons() {
   const wager = isDD ? currentDDWager : pts;
 
   gameData.players.forEach((p, i) => {
-    // For Daily Double, only show the wagering player
     if (isDD && i !== currentDDPlayerIndex) return;
 
     const group = document.createElement('div');
@@ -229,6 +256,20 @@ function renderModalScoreButtons() {
 function revealAnswer() {
   document.getElementById('modalAnswer').classList.add('visible');
   document.getElementById('revealAnswerBtn').classList.add('hidden');
+
+  const q = currentQuestion.q;
+  const cat = gameData.categories[currentQuestion.ci];
+  broadcast({
+    view: 'answer',
+    category: cat.name || '',
+    points: q.points,
+    question: q.question || '',
+    answer: q.answer || '',
+    image: q.image || null,
+    isDailyDouble: q.isDailyDouble,
+    wager: currentDDWager,
+    game: gameData
+  });
 }
 
 function closeModal(markAnswered) {
@@ -242,10 +283,10 @@ function closeModal(markAnswered) {
   currentDDWager = 0;
   currentDDPlayerIndex = -1;
   document.getElementById('modalOverlay').classList.add('hidden');
+  broadcast({ view: 'board', game: gameData });
 }
 
 function handleOverlayClick(e) {
-  // Only close if clicking the overlay itself, not the modal
   if (e.target === document.getElementById('modalOverlay')) {
     closeModal(false);
   }
@@ -255,6 +296,12 @@ function handleOverlayClick(e) {
 function goToFinal() {
   saveState();
   location.href = 'final.html';
+}
+
+// ===== AUDIENCE WINDOW =====
+function openAudienceScreen() {
+  window.open('audience.html', 'datapardy_audience',
+    'width=1280,height=720,menubar=no,toolbar=no,location=no');
 }
 
 // ===== PERSIST =====

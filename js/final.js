@@ -1,6 +1,21 @@
+// ===== BROADCAST CHANNEL =====
+const channel = new BroadcastChannel('datapardy');
+let currentScene = null;
+
+function broadcast(scene) {
+  currentScene = scene;
+  channel.postMessage({ type: 'scene', scene });
+}
+
+channel.onmessage = (e) => {
+  if (e.data.type === 'sync_request' && currentScene) {
+    broadcast(currentScene);
+  }
+};
+
 // ===== STATE =====
 let gameData = null;
-let wagers = []; // indexed by player
+let wagers = [];
 
 // ===== INIT =====
 window.addEventListener('DOMContentLoaded', () => {
@@ -23,12 +38,14 @@ window.addEventListener('DOMContentLoaded', () => {
   const fj = gameData.finalJeopardy;
   const catName = fj.category || 'Final Jeopardy';
 
-  // Set category name in all stages
   document.getElementById('finalCategoryDisplay').textContent = catName;
   document.getElementById('finalCategoryDisplay2').textContent = catName;
   document.getElementById('finalCategoryDisplay3').textContent = catName;
 
   renderWagerGrid();
+
+  // Show category on audience screen immediately
+  broadcast({ view: 'final_wager', category: catName, game: gameData });
 });
 
 // ===== STAGE 1: WAGERS =====
@@ -51,7 +68,6 @@ function renderWagerGrid() {
 }
 
 function goToQuestion() {
-  // Collect wagers
   gameData.players.forEach((p, i) => {
     const input = document.getElementById(`wager-${i}`);
     wagers[i] = parseInt(input ? input.value : 0) || 0;
@@ -63,7 +79,6 @@ function goToQuestion() {
   document.getElementById('finalQuestionDisplay2').textContent = fj.question || '(no question)';
   document.getElementById('finalAnswerDisplay').textContent = fj.answer || '(no answer)';
 
-  // Images
   const img1 = document.getElementById('finalImageDisplay');
   const img2 = document.getElementById('finalImageDisplay2');
   if (fj.image) {
@@ -77,12 +92,30 @@ function goToQuestion() {
   }
 
   showStage('stage-question');
+  broadcast({
+    view: 'final_question',
+    category: fj.category || 'Final Jeopardy',
+    question: fj.question || '',
+    image: fj.image || null,
+    game: gameData
+  });
 }
 
 // ===== STAGE 2: ANSWER =====
 function goToAnswer() {
   renderFinalScoreRows();
   showStage('stage-answer');
+
+  const fj = gameData.finalJeopardy;
+  broadcast({
+    view: 'final_answer',
+    category: fj.category || 'Final Jeopardy',
+    question: fj.question || '',
+    answer: fj.answer || '',
+    image: fj.image || null,
+    players: gameData.players.map((p, i) => ({ name: p.name, score: p.score, wager: wagers[i] || 0 })),
+    game: gameData
+  });
 }
 
 function renderFinalScoreRows() {
@@ -117,11 +150,24 @@ function renderFinalScoreRows() {
 function adjustFinalScore(playerIndex, delta) {
   gameData.players[playerIndex].score += delta;
   saveState();
+
   const el = document.getElementById(`final-score-${playerIndex}`);
   if (el) {
     el.textContent = formatScore(gameData.players[playerIndex].score);
     el.className = `score-display ${gameData.players[playerIndex].score < 0 ? 'negative' : ''}`;
   }
+
+  // Re-broadcast final_answer with updated scores
+  const fj = gameData.finalJeopardy;
+  broadcast({
+    view: 'final_answer',
+    category: fj.category || 'Final Jeopardy',
+    question: fj.question || '',
+    answer: fj.answer || '',
+    image: fj.image || null,
+    players: gameData.players.map((p, i) => ({ name: p.name, score: p.score, wager: wagers[i] || 0 })),
+    game: gameData
+  });
 }
 
 // ===== PLAY AGAIN =====

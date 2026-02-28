@@ -1,0 +1,241 @@
+{
+  "title": "DataPardy Test Game",
+  "players": [
+    { "name": "Alex", "score": 0 },
+    { "name": "Sam", "score": 0 },
+    { "name": "Jordan", "score": 0 }
+  ],
+  "categories": [
+    {
+      "name": "Science",
+      "questions": [
+        {
+          "points": 200,
+          "question": "This gas makes up about 78% of Earth's atmosphere.",
+          "answer": "What is Nitrogen?",
+          "image": null,
+          "isDailyDouble": false,
+          "answered": false
+        },
+        {
+          "points": 400,
+          "question": "The speed of light in a vacuum is approximately this many kilometers per second.",
+          "answer": "What is 300,000 km/s?",
+          "image": null,
+          "isDailyDouble": false,
+          "answered": false
+        },
+        {
+          "points": 600,
+          "question": "This scientist developed the theory of general relativity.",
+          "answer": "Who is Albert Einstein?",
+          "image": null,
+          "isDailyDouble": true,
+          "answered": false
+        },
+        {
+          "points": 800,
+          "question": "The powerhouse of the cell.",
+          "answer": "What is the mitochondria?",
+          "image": null,
+          "isDailyDouble": false,
+          "answered": false
+        },
+        {
+          "points": 1000,
+          "question": "This is the only planet in our solar system that rotates on its side, with an axial tilt of about 98 degrees.",
+          "answer": "What is Uranus?",
+          "image": null,
+          "isDailyDouble": false,
+          "answered": false
+        }
+      ]
+    },
+    {
+      "name": "Pop Culture",
+      "questions": [
+        {
+          "points": 200,
+          "question": "This streaming giant released the series 'Stranger Things'.",
+          "answer": "What is Netflix?",
+          "image": null,
+          "isDailyDouble": false,
+          "answered": false
+        },
+        {
+          "points": 400,
+          "question": "Taylor Swift's 2023 tour, one of the highest-grossing of all time, was called this.",
+          "answer": "What is the Eras Tour?",
+          "image": null,
+          "isDailyDouble": false,
+          "answered": false
+        },
+        {
+          "points": 600,
+          "question": "This Marvel superhero is also known as the Merc with a Mouth.",
+          "answer": "Who is Deadpool?",
+          "image": null,
+          "isDailyDouble": false,
+          "answered": false
+        },
+        {
+          "points": 800,
+          "question": "This video game franchise features a plumber who rescues Princess Peach.",
+          "answer": "What is Super Mario?",
+          "image": null,
+          "isDailyDouble": true,
+          "answered": false
+        },
+        {
+          "points": 1000,
+          "question": "This actor played both Iron Man in the MCU and Sherlock Holmes in Guy Ritchie's film series.",
+          "answer": "Who is Robert Downey Jr.?",
+          "image": null,
+          "isDailyDouble": false,
+          "answered": false
+        }
+      ]
+    },
+    {
+      "name": "Geography",
+      "questions": [
+        {
+          "points": 200,
+          "question": "This is the smallest country in the world by area.",
+          "answer": "What is Vatican City?",
+          "image": null,
+          "isDailyDouble": false,
+          "answered": false
+        },
+        {
+          "points": 400,
+          "question": "The Amazon River flows through this country before emptying into the Atlantic Ocean.",
+          "answer": "What is Brazil?",
+          "image": null,
+          "isDailyDouble": false,
+          "answered": false
+        },
+        {
+          "points": 600,
+          "question": "This African country has the most pyramids in the world — more than Egypt.",
+          "answer": "What is Sudan?",
+          "image": null,
+          "isDailyDouble": false,
+          "answered": false
+        },
+        {
+          "points": 800,
+          "question": "Mount Everest sits on the border of Nepal and this country.",
+          "answer": "What is China?",
+          "image": null,
+          "isDailyDouble": false,
+          "answered": false
+        },
+        {
+          "points": 1000,
+          "question": "This is the only country that borders both the Atlantic and Indian Oceans.",
+          "answer": "What is South Africa?",
+          "image": null,
+          "isDailyDouble": false,
+          "answered": false
+        }
+      ]
+    },
+    {
+      "name": "Tech & Coding",
+      "questions": [
+        {
+          "points": 200,
+          "question": "This programming language is often called the 'language of the web' for front-end development.",
+          "answer": "What is JavaScript?",
+          "image": null,
+          "isDailyDouble": false,
+          "answered": false
+        },
+        {
+          "points": 400,
+          "question": "In version control, this command downloads a remote repository to your local machine.",
+          "answer": "What is git clone?",
+          "image": null,
+          "isDailyDouble": false,
+          "answered": false
+        },
+        {
+          "points": 600,
+          "question": "This data structure operates on a Last In, First Out (LIFO) principle.",
+          "answer": "What is a Stack?",
+          "image": null,
+          "isDailyDouble": false,
+          "answered": false
+        },
+        {
+          "points": 800,
+          "question": "This company created the TypeScript programming language.",
+          "answer": "What is Microsoft?",
+          "image": null,
+          "isDailyDouble": false,
+          "answered": false
+        },
+        {
+          "points": 1000,
+          "question": "In Big-O notation, this describes an algorithm whose runtime doubles with each additional input element.",
+          "answer": "What is O(2^n) — exponential time?",
+          "image": null,
+          "isDailyDouble": false,
+          "answered": false
+        }
+      ]
+    },
+    {
+      "name": "Food & Drink",
+      "questions": [
+        {
+          "points": 200,
+          "question": "This Italian dish is made with rice cooked slowly in broth until creamy.",
+          "answer": "What is risotto?",
+          "image": null,
+          "isDailyDouble": false,
+          "answered": false
+        },
+        {
+          "points": 400,
+          "question": "Scoville units measure the heat level of this type of food.",
+          "answer": "What are chili peppers / hot peppers?",
+          "image": null,
+          "isDailyDouble": false,
+          "answered": false
+        },
+        {
+          "points": 600,
+          "question": "This Japanese spirit is made from fermented rice and is the base of sake.",
+          "answer": "What is rice? (Accept: koji-fermented rice)",
+          "image": null,
+          "isDailyDouble": false,
+          "answered": false
+        },
+        {
+          "points": 800,
+          "question": "This French cooking technique involves cooking food in a vacuum-sealed bag in a water bath at a precise low temperature.",
+          "answer": "What is sous vide?",
+          "image": null,
+          "isDailyDouble": false,
+          "answered": false
+        },
+        {
+          "points": 1000,
+          "question": "Named after a Russian count, this beef dish is served with sour cream sauce over egg noodles.",
+          "answer": "What is Beef Stroganoff?",
+          "image": null,
+          "isDailyDouble": false,
+          "answered": false
+        }
+      ]
+    }
+  ],
+  "finalJeopardy": {
+    "category": "World Records",
+    "question": "This is the longest river in the world by length, stretching over 6,650 kilometers through northeastern Africa.",
+    "answer": "What is the Nile River?",
+    "image": null
+  }
+}
