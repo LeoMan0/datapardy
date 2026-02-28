@@ -36,6 +36,8 @@ window.addEventListener('DOMContentLoaded', () => {
 function emptyGame() {
   return {
     title: '',
+    hostScoring: false,
+    rules: '',
     players: [],
     categories: [],
     finalJeopardy: { category: '', question: '', answer: '', image: null }
@@ -45,6 +47,8 @@ function emptyGame() {
 // ===== RENDER ALL =====
 function renderAll() {
   document.getElementById('gameTitle').value = gameData.title || '';
+  document.getElementById('hostScoring').checked = !!gameData.hostScoring;
+  document.getElementById('gameRules').value = gameData.rules || '';
   renderPlayers();
   renderCategories();
   renderFinalJeopardy();
@@ -216,7 +220,7 @@ function removeQuestion(ci, qi) {
 }
 
 function newQuestion(points) {
-  return { question: '', answer: '', points: points || 200, image: null, isDailyDouble: false, answered: false };
+  return { question: '', answer: '', points: points || 200, image: null, isDailyDouble: false, answered: false, inProgress: false };
 }
 
 function updateQuestion(ci, qi, field, value) {
@@ -289,6 +293,8 @@ function clearFinalImage() {
 // ===== COLLECT FORM DATA =====
 function collectFormData() {
   gameData.title = document.getElementById('gameTitle').value.trim() || 'Jeopardy Game';
+  gameData.hostScoring = document.getElementById('hostScoring').checked;
+  gameData.rules = document.getElementById('gameRules').value;
 
   // Collect player names from live inputs
   const playerInputs = document.querySelectorAll('.player-entry input[type="text"]');
@@ -373,9 +379,9 @@ function startGame() {
 
   // Ensure all players have score field
   gameData.players.forEach(p => { if (p.score === undefined) p.score = 0; });
-  // Ensure all questions have answered field
+  // Ensure all questions have answered field (don't overwrite existing state)
   gameData.categories.forEach(cat => {
-    cat.questions.forEach(q => { q.answered = false; });
+    cat.questions.forEach(q => { if (q.answered === undefined) q.answered = false; });
   });
 
   localStorage.setItem('datapardy_game', JSON.stringify(gameData));

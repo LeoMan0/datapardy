@@ -26,6 +26,10 @@
           onclick="openAudienceScreen()">
           📺 Open Audience Screen
         </button>
+        <button class="btn btn-secondary btn-sm" style="width:100%;margin-bottom:8px"
+          onclick="showRules()">
+          📋 Show Rules
+        </button>
         <button class="btn btn-primary" style="width:100%" onclick="goToFinal()">
           Final Jeopardy ★
         </button>
@@ -57,13 +61,17 @@
       <div id="modalQuestionSection" class="hidden">
         <img id="modalImage" class="modal-image hidden" alt="question image">
         <div class="modal-question" id="modalQuestion"></div>
-        <div class="modal-answer" id="modalAnswer">
-          <div class="answer-label">Answer</div>
+        <div class="modal-answer host-preview" id="modalAnswer">
+          <div class="answer-label">
+            Answer
+            <span class="host-only-badge" id="hostOnlyBadge">HOST ONLY</span>
+          </div>
           <div id="modalAnswerText"></div>
         </div>
         <div class="score-buttons" id="scoreButtons"></div>
         <div class="modal-footer">
-          <button class="btn btn-secondary" id="revealAnswerBtn" onclick="revealAnswer()">Reveal Answer</button>
+          <button class="btn btn-secondary" id="revealAnswerBtn" onclick="revealAnswer()">Reveal to Audience</button>
+          <button class="btn btn-secondary btn-sm" onclick="pauseQuestion()">⏸ Come Back To This</button>
           <button class="btn btn-danger btn-sm" onclick="closeModal(false)">Close (No Score)</button>
           <button class="btn btn-success" onclick="closeModal(true)">Done ✓</button>
         </div>

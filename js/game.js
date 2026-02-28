@@ -20,6 +20,7 @@ let gameData = null;
 let currentQuestion = null; // { ci, qi, q }
 let currentDDWager = 0;
 let currentDDPlayerIndex = -1;
+let anyContestantScoredPositive = false; // tracks host scoring for current question
 
 // ===== INIT =====
 window.addEventListener('DOMContentLoaded', () => {
@@ -35,6 +36,12 @@ window.addEventListener('DOMContentLoaded', () => {
     alert('Game data is corrupted. Please set up again.');
     location.href = 'setup.html';
     return;
+  }
+
+  // Inject host player if host scoring is enabled and not already present
+  if (gameData.hostScoring && !gameData.players.some(p => p.isHost)) {
+    gameData.players.unshift({ name: 'Host', score: 0, isHost: true });
+    saveState();
   }
 
   document.getElementById('gameTitle').textContent = gameData.title || 'DataPardy';
@@ -77,6 +84,10 @@ function renderBoard() {
       }
       if (q.answered) {
         cell.classList.add('answered');
+      } else if (q.inProgress) {
+        cell.classList.add('in-progress');
+        cell.innerHTML = `<span>$${q.points}</span><span class="in-progress-icon">↩</span>`;
+        cell.onclick = () => openQuestion(ci, qi);
       } else {
         cell.textContent = '$' + q.points;
         cell.onclick = () => openQuestion(ci, qi);
@@ -92,7 +103,7 @@ function renderScores() {
   container.innerHTML = '';
   gameData.players.forEach((p, i) => {
     const card = document.createElement('div');
-    card.className = 'player-score-card';
+    card.className = 'player-score-card' + (p.isHost ? ' host-card' : '');
     card.id = `score-card-${i}`;
     card.innerHTML = `
       <div class="player-score-name">${escHtml(p.name)}</div>
@@ -119,6 +130,10 @@ function formatScore(n) {
 }
 
 function adjustScore(playerIndex, delta) {
+  // Track whether any contestant (non-host) scored positive this question
+  if (!gameData.players[playerIndex].isHost && delta > 0) {
+    anyContestantScoredPositive = true;
+  }
   gameData.players[playerIndex].score += delta;
   saveState();
   updateScoreDisplay(playerIndex);
@@ -127,6 +142,17 @@ function adjustScore(playerIndex, delta) {
   if (currentScene) {
     broadcast({ ...currentScene, game: gameData });
   }
+}
+
+// ===== HOST AUTO-SCORING =====
+function applyHostScore() {
+  const hostIndex = gameData.players.findIndex(p => p.isHost);
+  if (hostIndex === -1 || !currentQuestion) return;
+
+  const pointValue = currentDDWager > 0 ? currentDDWager : currentQuestion.q.points;
+  const delta = anyContestantScoredPositive ? -pointValue : pointValue;
+  gameData.players[hostIndex].score += delta;
+  updateScoreDisplay(hostIndex);
 }
 
 // ===== MODAL =====
@@ -138,10 +164,14 @@ function openQuestion(ci, qi) {
   currentQuestion = { ci, qi, q };
   currentDDWager = 0;
   currentDDPlayerIndex = -1;
+  anyContestantScoredPositive = false;
 
   document.getElementById('modalCategory').textContent = cat.name || '';
   document.getElementById('modalPoints').textContent = '$' + q.points;
-  document.getElementById('modalAnswer').classList.remove('visible');
+  const answerEl = document.getElementById('modalAnswer');
+  answerEl.classList.remove('visible');
+  answerEl.classList.add('host-preview');
+  document.getElementById('hostOnlyBadge').classList.remove('hidden');
   document.getElementById('modalAnswerText').textContent = q.answer || '';
   document.getElementById('revealAnswerBtn').classList.remove('hidden');
 
@@ -161,7 +191,9 @@ function showDDSection(categoryName, points) {
 
   const sel = document.getElementById('ddPlayerSelect');
   sel.innerHTML = '';
+  // Don't offer host as a DD wager player
   gameData.players.forEach((p, i) => {
+    if (p.isHost) return;
     const opt = document.createElement('option');
     opt.value = i;
     opt.textContent = p.name + ' (' + formatScore(p.score) + ')';
@@ -223,6 +255,9 @@ function renderModalScoreButtons() {
   const wager = isDD ? currentDDWager : pts;
 
   gameData.players.forEach((p, i) => {
+    // Skip host — they have no manual buttons
+    if (p.isHost) return;
+    // For Daily Double, only show the wagering player
     if (isDD && i !== currentDDPlayerIndex) return;
 
     const group = document.createElement('div');
@@ -254,7 +289,10 @@ function renderModalScoreButtons() {
 }
 
 function revealAnswer() {
-  document.getElementById('modalAnswer').classList.add('visible');
+  const answerEl = document.getElementById('modalAnswer');
+  answerEl.classList.remove('host-preview');
+  answerEl.classList.add('visible');
+  document.getElementById('hostOnlyBadge').classList.add('hidden');
   document.getElementById('revealAnswerBtn').classList.add('hidden');
 
   const q = currentQuestion.q;
@@ -272,9 +310,26 @@ function revealAnswer() {
   });
 }
 
+function pauseQuestion() {
+  if (!currentQuestion) return;
+  const { ci, qi } = currentQuestion;
+  gameData.categories[ci].questions[qi].inProgress = true;
+  saveState();
+  renderBoard();
+  currentQuestion = null;
+  currentDDWager = 0;
+  currentDDPlayerIndex = -1;
+  anyContestantScoredPositive = false;
+  document.getElementById('modalOverlay').classList.add('hidden');
+  broadcast({ view: 'board', game: gameData });
+}
+
 function closeModal(markAnswered) {
   if (currentQuestion && markAnswered) {
+    // Auto-score the host before marking done
+    applyHostScore();
     const { ci, qi } = currentQuestion;
+    gameData.categories[ci].questions[qi].inProgress = false;
     gameData.categories[ci].questions[qi].answered = true;
     saveState();
     renderBoard();
@@ -282,6 +337,7 @@ function closeModal(markAnswered) {
   currentQuestion = null;
   currentDDWager = 0;
   currentDDPlayerIndex = -1;
+  anyContestantScoredPositive = false;
   document.getElementById('modalOverlay').classList.add('hidden');
   broadcast({ view: 'board', game: gameData });
 }
@@ -296,6 +352,11 @@ function handleOverlayClick(e) {
 function goToFinal() {
   saveState();
   location.href = 'final.html';
+}
+
+// ===== RULES =====
+function showRules() {
+  broadcast({ view: 'rules', rules: gameData.rules || '', title: gameData.title || 'DataPardy' });
 }
 
 // ===== AUDIENCE WINDOW =====

@@ -64,6 +64,17 @@ function applyScene(scene) {
       show('scene-final-answer');
       break;
 
+    case 'rules': {
+      document.getElementById('rulesGameTitle').textContent = scene.title || 'DataPardy';
+      const body = document.getElementById('rulesBody');
+      const lines = (scene.rules || 'No rules specified.')
+        .split('\n')
+        .filter(l => l.trim());
+      body.innerHTML = lines.map(l => `<p>${escHtml(l)}</p>`).join('');
+      show('scene-rules');
+      break;
+    }
+
     default:
       show('scene-waiting');
   }
@@ -96,6 +107,9 @@ function renderBoard(gameData) {
       const q = cat.questions[qi];
       if (!q || q.answered) {
         cell.classList.add('answered');
+      } else if (q.inProgress) {
+        cell.classList.add('in-progress');
+        cell.innerHTML = `<span>$${q.points}</span><span class="in-progress-icon">↩</span>`;
       } else {
         cell.textContent = '$' + q.points;
       }
@@ -147,16 +161,55 @@ function renderFinalScores(players) {
   const container = document.getElementById('fjScores');
   if (!container) return;
   container.innerHTML = '';
-  players.forEach(p => {
+  if (!players || !players.length) return;
+
+  // Sort by score descending
+  const sorted = [...players].sort((a, b) => (b.score || 0) - (a.score || 0));
+  const top3 = sorted.slice(0, 3);
+  const rest = sorted.slice(3);
+
+  // Podium: visual order is 2nd, 1st, 3rd (1st in center)
+  const podiumDiv = document.createElement('div');
+  podiumDiv.className = 'audience-podium';
+
+  const podiumOrder = top3.length === 1
+    ? [{ p: top3[0], rank: 1 }]
+    : top3.length === 2
+      ? [{ p: top3[1], rank: 2 }, { p: top3[0], rank: 1 }]
+      : [{ p: top3[1], rank: 2 }, { p: top3[0], rank: 1 }, { p: top3[2], rank: 3 }];
+
+  podiumOrder.forEach(({ p, rank }) => {
     const score = p.score || 0;
-    const card = document.createElement('div');
-    card.className = 'audience-final-score-card';
-    card.innerHTML = `
-      <div class="player-name">${escHtml(p.name)}</div>
-      <div class="player-score ${score < 0 ? 'negative' : ''}">${formatScore(score)}</div>
+    const place = document.createElement('div');
+    place.className = `audience-podium-place place-${rank}`;
+    place.innerHTML = `
+      <div class="audience-podium-name">${escHtml(p.name)}</div>
+      <div class="audience-podium-score ${score < 0 ? 'negative' : ''}">${formatScore(score)}</div>
+      <div class="audience-podium-stand"><span class="audience-podium-rank">#${rank}</span></div>
     `;
-    container.appendChild(card);
+    podiumDiv.appendChild(place);
   });
+
+  container.appendChild(podiumDiv);
+
+  // Remaining players as an ordered list
+  if (rest.length > 0) {
+    const listDiv = document.createElement('div');
+    listDiv.className = 'audience-podium-rest';
+    rest.forEach((p, idx) => {
+      const rank = idx + 4;
+      const score = p.score || 0;
+      const item = document.createElement('div');
+      item.className = 'audience-podium-rest-item';
+      item.innerHTML = `
+        <span class="audience-podium-rest-rank">${rank}</span>
+        <span class="audience-podium-rest-name">${escHtml(p.name)}</span>
+        <span class="audience-podium-rest-score ${score < 0 ? 'negative' : ''}">${formatScore(score)}</span>
+      `;
+      listDiv.appendChild(item);
+    });
+    container.appendChild(listDiv);
+  }
 }
 
 // ===== HELPERS =====

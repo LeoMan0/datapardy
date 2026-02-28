@@ -40,7 +40,6 @@ window.addEventListener('DOMContentLoaded', () => {
 
   document.getElementById('finalCategoryDisplay').textContent = catName;
   document.getElementById('finalCategoryDisplay2').textContent = catName;
-  document.getElementById('finalCategoryDisplay3').textContent = catName;
 
   renderWagerGrid();
 
@@ -68,7 +67,7 @@ function renderWagerGrid() {
 }
 
 function goToQuestion() {
-  gameData.players.forEach((p, i) => {
+  gameData.players.forEach((_p, i) => {
     const input = document.getElementById(`wager-${i}`);
     wagers[i] = parseInt(input ? input.value : 0) || 0;
   });
@@ -76,20 +75,18 @@ function goToQuestion() {
   const fj = gameData.finalJeopardy;
 
   document.getElementById('finalQuestionDisplay').textContent = fj.question || '(no question)';
-  document.getElementById('finalQuestionDisplay2').textContent = fj.question || '(no question)';
   document.getElementById('finalAnswerDisplay').textContent = fj.answer || '(no answer)';
 
   const img1 = document.getElementById('finalImageDisplay');
-  const img2 = document.getElementById('finalImageDisplay2');
   if (fj.image) {
     img1.src = fj.image;
     img1.classList.remove('hidden');
-    img2.src = fj.image;
-    img2.classList.remove('hidden');
   } else {
     img1.classList.add('hidden');
-    img2.classList.add('hidden');
   }
+
+  renderFinalScoreRows();
+  document.getElementById('revealFinalABtn').classList.remove('hidden');
 
   showStage('stage-question');
   broadcast({
@@ -101,11 +98,8 @@ function goToQuestion() {
   });
 }
 
-// ===== STAGE 2: ANSWER =====
-function goToAnswer() {
-  renderFinalScoreRows();
-  showStage('stage-answer');
-
+function revealFinalAnswer() {
+  document.getElementById('revealFinalABtn').classList.add('hidden');
   const fj = gameData.finalJeopardy;
   broadcast({
     view: 'final_answer',
@@ -113,8 +107,7 @@ function goToAnswer() {
     question: fj.question || '',
     answer: fj.answer || '',
     image: fj.image || null,
-    players: gameData.players.map((p, i) => ({ name: p.name, score: p.score, wager: wagers[i] || 0 })),
-    game: gameData
+    // no players — scores stay hidden until revealFinalScores()
   });
 }
 
@@ -156,8 +149,9 @@ function adjustFinalScore(playerIndex, delta) {
     el.textContent = formatScore(gameData.players[playerIndex].score);
     el.className = `score-display ${gameData.players[playerIndex].score < 0 ? 'negative' : ''}`;
   }
+}
 
-  // Re-broadcast final_answer with updated scores
+function revealFinalScores() {
   const fj = gameData.finalJeopardy;
   broadcast({
     view: 'final_answer',

@@ -23,6 +23,12 @@
           <input type="text" id="gameTitle" placeholder="My Jeopardy Game" maxlength="80">
         </div>
       </div>
+      <div class="form-row" style="margin-top:4px">
+        <label class="host-toggle-label">
+          <input type="checkbox" id="hostScoring">
+          Include Host in scoring — host earns points when contestants fail, loses when they succeed
+        </label>
+      </div>
     </div>
 
     <!-- Players -->
@@ -69,6 +75,18 @@
           <img id="finalImagePreview" class="image-preview hidden" alt="preview">
           <button class="image-clear hidden" id="finalImageClear" onclick="clearFinalImage()">✕ Remove</button>
         </div>
+      </div>
+    </div>
+
+    <!-- Game Rules -->
+    <div class="setup-section">
+      <h2>Game Rules</h2>
+      <p style="color:var(--tan);font-size:0.82rem;margin-bottom:10px">
+        Write your house rules here. The host can display them on the audience screen at any time during the game.
+      </p>
+      <div class="form-group">
+        <textarea id="gameRules" rows="8"
+          placeholder="e.g. Answer in the form of a question&#10;No phones during the game&#10;Host's decision is final&#10;Each contestant selects one question per round"></textarea>
       </div>
     </div>
 
