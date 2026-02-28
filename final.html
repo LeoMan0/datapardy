@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DataPardy — Final Jeopardy</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="site-header">
+    <h1>DataPardy</h1>
+    <div class="subtitle">Final Jeopardy</div>
+  </header>
+
+  <div class="final-container">
+
+    <!-- Stage 1: Wagers -->
+    <div class="final-stage active" id="stage-wager">
+      <div class="text-center" style="margin-bottom:8px;color:var(--tan);font-size:0.85rem;text-transform:uppercase;letter-spacing:2px">
+        Category
+      </div>
+      <div class="final-category-banner" id="finalCategoryDisplay">—</div>
+      <p class="text-center" style="color:var(--tan);margin-bottom:24px">
+        All players write down their wagers before the question is revealed.
+      </p>
+      <div class="wager-grid" id="wagerGrid"></div>
+      <div class="stage-actions">
+        <button class="btn btn-secondary" onclick="location.href='game.html'">← Back to Board</button>
+        <button class="btn btn-primary" onclick="goToQuestion()">Reveal Question →</button>
+      </div>
+    </div>
+
+    <!-- Stage 2: Question -->
+    <div class="final-stage" id="stage-question">
+      <div class="final-category-banner" id="finalCategoryDisplay2">—</div>
+      <div class="final-question-box" id="finalQuestionDisplay"></div>
+      <img id="finalImageDisplay" class="modal-image hidden" alt="Final Jeopardy image">
+      <div class="stage-actions">
+        <button class="btn btn-primary" onclick="goToAnswer()">Reveal Answer →</button>
+      </div>
+    </div>
+
+    <!-- Stage 3: Answer + Score Adjust -->
+    <div class="final-stage" id="stage-answer">
+      <div class="final-category-banner" id="finalCategoryDisplay3">—</div>
+      <div class="final-question-box" id="finalQuestionDisplay2" style="margin-bottom:12px"></div>
+      <div class="final-answer-box" id="finalAnswerDisplay"></div>
+      <img id="finalImageDisplay2" class="modal-image hidden" alt="Final Jeopardy image">
+
+      <h2 style="font-family:var(--font-main);color:var(--gold);font-size:1rem;text-transform:uppercase;letter-spacing:2px;margin:24px 0 12px">
+        Adjust Scores
+      </h2>
+      <div id="finalScoreRows"></div>
+
+      <div class="stage-actions" style="margin-top:32px">
+        <button class="btn btn-secondary" onclick="resetGame()">🔁 Play Again</button>
+        <button class="btn btn-primary" onclick="location.href='index.html'">🏠 Home</button>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="js/final.js"></script>
+</body>
+</html>

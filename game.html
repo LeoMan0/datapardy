@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DataPardy — Game Board</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="site-header" style="padding:8px 20px">
+    <h1 id="gameTitle" style="font-size:1.4rem;letter-spacing:2px">DataPardy</h1>
+  </header>
+
+  <div class="game-layout">
+    <!-- Board -->
+    <div class="board-area">
+      <div class="jeopardy-board" id="board"></div>
+    </div>
+
+    <!-- Score Panel -->
+    <div class="score-panel">
+      <h2>Scores</h2>
+      <div id="scoreCards"></div>
+      <div class="final-jeopardy-btn-wrap">
+        <button class="btn btn-primary" style="width:100%" onclick="goToFinal()">
+          Final Jeopardy ★
+        </button>
+        <button class="btn btn-secondary btn-sm" style="width:100%;margin-top:8px"
+          onclick="if(confirm('Return to setup? Game progress is saved.')) location.href='setup.html'">
+          ← Setup
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Question Modal -->
+  <div class="modal-overlay hidden" id="modalOverlay" onclick="handleOverlayClick(event)">
+    <div class="modal" id="modal">
+      <div class="modal-category" id="modalCategory"></div>
+      <div class="modal-points" id="modalPoints"></div>
+      <div id="modalDDSection" class="hidden">
+        <div class="daily-double-banner">DAILY DOUBLE!</div>
+        <div class="wager-form">
+          <div class="wager-player-select" id="ddWagerSection">
+            <label>Who is wagering?</label>
+            <select id="ddPlayerSelect"></select>
+            <label style="margin-top:8px">Wager Amount ($)</label>
+            <input type="number" id="ddWagerAmount" min="0" placeholder="Enter wager">
+          </div>
+          <button class="btn btn-primary" onclick="confirmDDWager()">Confirm Wager & Show Question</button>
+        </div>
+      </div>
+      <div id="modalQuestionSection" class="hidden">
+        <img id="modalImage" class="modal-image hidden" alt="question image">
+        <div class="modal-question" id="modalQuestion"></div>
+        <div class="modal-answer" id="modalAnswer">
+          <div class="answer-label">Answer</div>
+          <div id="modalAnswerText"></div>
+        </div>
+        <div class="score-buttons" id="scoreButtons"></div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" id="revealAnswerBtn" onclick="revealAnswer()">Reveal Answer</button>
+          <button class="btn btn-danger btn-sm" onclick="closeModal(false)">Close (No Score)</button>
+          <button class="btn btn-success" onclick="closeModal(true)">Done ✓</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/game.js"></script>
+</body>
+</html>

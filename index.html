@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DataPardy</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="site-header">
+    <h1>DataPardy</h1>
+    <div class="subtitle">Custom Jeopardy Game</div>
+  </header>
+
+  <main class="landing">
+    <div class="landing-description">
+      Create a custom Jeopardy game with your own categories, questions, and images.
+      Save and load game sessions as JSON files.
+    </div>
+
+    <div class="landing-buttons">
+      <button class="btn landing-btn btn-primary" onclick="location.href='setup.html'">
+        <span class="icon">✏️</span>
+        New Game
+      </button>
+
+      <button class="btn landing-btn btn-secondary" onclick="document.getElementById('loadFileInput').click()">
+        <span class="icon">📂</span>
+        Load Game
+      </button>
+      <input type="file" id="loadFileInput" accept=".json" class="hidden" onchange="loadGame(event)">
+    </div>
+
+    <div id="loadError" class="hidden" style="color:#f88; font-size:0.9rem;"></div>
+  </main>
+
+  <script>
+    function loadGame(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const data = JSON.parse(e.target.result);
+          // Basic validation
+          if (!data.categories || !Array.isArray(data.categories)) {
+            throw new Error('Invalid game file format');
+          }
+          localStorage.setItem('datapardy_game', JSON.stringify(data));
+          location.href = 'setup.html?loaded=1';
+        } catch (err) {
+          const el = document.getElementById('loadError');
+          el.textContent = 'Error loading file: ' + err.message;
+          el.classList.remove('hidden');
+        }
+      };
+      reader.readAsText(file);
+    }
+  </script>
+</body>
+</html>

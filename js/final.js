@@ -1,0 +1,162 @@
+// ===== STATE =====
+let gameData = null;
+let wagers = []; // indexed by player
+
+// ===== INIT =====
+window.addEventListener('DOMContentLoaded', () => {
+  const raw = localStorage.getItem('datapardy_game');
+  if (!raw) {
+    alert('No game data found.');
+    location.href = 'index.html';
+    return;
+  }
+  try {
+    gameData = JSON.parse(raw);
+  } catch {
+    alert('Game data is corrupted.');
+    location.href = 'index.html';
+    return;
+  }
+
+  wagers = gameData.players.map(() => 0);
+
+  const fj = gameData.finalJeopardy;
+  const catName = fj.category || 'Final Jeopardy';
+
+  // Set category name in all stages
+  document.getElementById('finalCategoryDisplay').textContent = catName;
+  document.getElementById('finalCategoryDisplay2').textContent = catName;
+  document.getElementById('finalCategoryDisplay3').textContent = catName;
+
+  renderWagerGrid();
+});
+
+// ===== STAGE 1: WAGERS =====
+function renderWagerGrid() {
+  const grid = document.getElementById('wagerGrid');
+  grid.innerHTML = '';
+
+  gameData.players.forEach((p, i) => {
+    const card = document.createElement('div');
+    card.className = 'wager-card';
+    card.innerHTML = `
+      <div class="player-name">${escHtml(p.name)}</div>
+      <div class="current-score">Current score: ${formatScore(p.score)}</div>
+      <label style="font-size:0.75rem;color:var(--tan);text-transform:uppercase;letter-spacing:0.5px">Wager</label>
+      <input type="number" id="wager-${i}" min="0" placeholder="$0"
+        oninput="wagers[${i}] = parseInt(this.value) || 0">
+    `;
+    grid.appendChild(card);
+  });
+}
+
+function goToQuestion() {
+  // Collect wagers
+  gameData.players.forEach((p, i) => {
+    const input = document.getElementById(`wager-${i}`);
+    wagers[i] = parseInt(input ? input.value : 0) || 0;
+  });
+
+  const fj = gameData.finalJeopardy;
+
+  document.getElementById('finalQuestionDisplay').textContent = fj.question || '(no question)';
+  document.getElementById('finalQuestionDisplay2').textContent = fj.question || '(no question)';
+  document.getElementById('finalAnswerDisplay').textContent = fj.answer || '(no answer)';
+
+  // Images
+  const img1 = document.getElementById('finalImageDisplay');
+  const img2 = document.getElementById('finalImageDisplay2');
+  if (fj.image) {
+    img1.src = fj.image;
+    img1.classList.remove('hidden');
+    img2.src = fj.image;
+    img2.classList.remove('hidden');
+  } else {
+    img1.classList.add('hidden');
+    img2.classList.add('hidden');
+  }
+
+  showStage('stage-question');
+}
+
+// ===== STAGE 2: ANSWER =====
+function goToAnswer() {
+  renderFinalScoreRows();
+  showStage('stage-answer');
+}
+
+function renderFinalScoreRows() {
+  const container = document.getElementById('finalScoreRows');
+  container.innerHTML = '';
+
+  gameData.players.forEach((p, i) => {
+    const wager = wagers[i] || 0;
+    const row = document.createElement('div');
+    row.className = 'final-score-row';
+    row.innerHTML = `
+      <div class="player-name-final">${escHtml(p.name)}</div>
+      <div style="font-size:0.78rem;color:var(--tan);margin-right:8px">
+        Wager: $${wager.toLocaleString()}
+      </div>
+      <div class="score-display ${p.score < 0 ? 'negative' : ''}" id="final-score-${i}">
+        ${formatScore(p.score)}
+      </div>
+      <div class="final-adjust-btns">
+        <button class="btn btn-success btn-sm" onclick="adjustFinalScore(${i}, ${wager})">
+          +$${wager.toLocaleString()}
+        </button>
+        <button class="btn btn-danger btn-sm" onclick="adjustFinalScore(${i}, -${wager})">
+          -$${wager.toLocaleString()}
+        </button>
+      </div>
+    `;
+    container.appendChild(row);
+  });
+}
+
+function adjustFinalScore(playerIndex, delta) {
+  gameData.players[playerIndex].score += delta;
+  saveState();
+  const el = document.getElementById(`final-score-${playerIndex}`);
+  if (el) {
+    el.textContent = formatScore(gameData.players[playerIndex].score);
+    el.className = `score-display ${gameData.players[playerIndex].score < 0 ? 'negative' : ''}`;
+  }
+}
+
+// ===== PLAY AGAIN =====
+function resetGame() {
+  if (!confirm('Reset all scores and answered tiles? Category/question data will be kept.')) return;
+  gameData.players.forEach(p => { p.score = 0; });
+  gameData.categories.forEach(cat => {
+    cat.questions.forEach(q => { q.answered = false; });
+  });
+  saveState();
+  location.href = 'game.html';
+}
+
+// ===== STAGE HELPER =====
+function showStage(id) {
+  document.querySelectorAll('.final-stage').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+// ===== PERSIST =====
+function saveState() {
+  localStorage.setItem('datapardy_game', JSON.stringify(gameData));
+}
+
+// ===== UTILITY =====
+function formatScore(n) {
+  if (n < 0) return '-$' + Math.abs(n).toLocaleString();
+  return '$' + n.toLocaleString();
+}
+
+function escHtml(str) {
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
