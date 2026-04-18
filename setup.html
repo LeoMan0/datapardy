@@ -1,105 +1,169 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>DataPardy — Setup</title>
-  <link rel="stylesheet" href="css/style.css">
-</head>
-<body>
-  <header class="site-header">
-    <h1>DataPardy</h1>
-    <div class="subtitle">Game Setup</div>
-  </header>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DataPardy — Setup</title>
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <h1>DataPardy</h1>
+      <div class="subtitle">Game Setup</div>
+    </header>
 
-  <div class="setup-container">
-
-    <!-- Game Title -->
-    <div class="setup-section">
-      <h2>Game Info</h2>
-      <div class="form-row">
-        <div class="form-group" style="max-width:420px">
-          <label for="gameTitle">Game Title</label>
-          <input type="text" id="gameTitle" placeholder="My Jeopardy Game" maxlength="80">
+    <div class="setup-container">
+      <!-- Game Title -->
+      <div class="setup-section">
+        <h2>Game Info</h2>
+        <div class="form-row">
+          <div class="form-group" style="max-width: 420px">
+            <label for="gameTitle">Game Title</label>
+            <input
+              type="text"
+              id="gameTitle"
+              placeholder="My Jeopardy Game"
+              maxlength="80"
+            />
+          </div>
+        </div>
+        <div class="form-row" style="margin-top: 4px">
+          <label class="host-toggle-label">
+            <input type="checkbox" id="hostScoring" />
+            Include Host in scoring — host earns points when contestants fail,
+            loses when they succeed
+          </label>
         </div>
       </div>
-      <div class="form-row" style="margin-top:4px">
-        <label class="host-toggle-label">
-          <input type="checkbox" id="hostScoring">
-          Include Host in scoring — host earns points when contestants fail, loses when they succeed
-        </label>
+
+      <!-- Players -->
+      <div class="setup-section">
+        <h2>Players (up to 6)</h2>
+        <div class="player-list" id="playerList"></div>
+        <button
+          class="btn btn-secondary btn-sm"
+          onclick="addPlayer()"
+          id="addPlayerBtn"
+        >
+          + Add Player
+        </button>
       </div>
-    </div>
 
-    <!-- Players -->
-    <div class="setup-section">
-      <h2>Players (up to 6)</h2>
-      <div class="player-list" id="playerList"></div>
-      <button class="btn btn-secondary btn-sm" onclick="addPlayer()" id="addPlayerBtn">+ Add Player</button>
-    </div>
+      <!-- Categories -->
+      <div class="setup-section">
+        <h2>Categories</h2>
+        <div id="categoryList"></div>
+        <button
+          class="btn btn-secondary btn-sm"
+          onclick="addCategory()"
+          id="addCategoryBtn"
+        >
+          + Add Category
+        </button>
+      </div>
 
-    <!-- Categories -->
-    <div class="setup-section">
-      <h2>Categories (up to 6)</h2>
-      <div id="categoryList"></div>
-      <button class="btn btn-secondary btn-sm" onclick="addCategory()" id="addCategoryBtn">+ Add Category</button>
-    </div>
+      <!-- Final Jeopardy -->
+      <div class="setup-section">
+        <h2>Final Jeopardy</h2>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Category Name</label>
+            <input
+              type="text"
+              id="finalCategory"
+              placeholder="e.g. World History"
+              maxlength="60"
+            />
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Question</label>
+            <textarea
+              id="finalQuestion"
+              placeholder="Enter the Final Jeopardy question..."
+              rows="3"
+            ></textarea>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Answer</label>
+            <textarea
+              id="finalAnswer"
+              placeholder="Enter the answer..."
+              rows="2"
+            ></textarea>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group" style="max-width: 260px">
+            <label>Image (optional)</label>
+            <input
+              type="file"
+              id="finalImage"
+              accept="image/*"
+              onchange="handleFinalImage(event)"
+              style="color: var(--tan)"
+            />
+          </div>
+          <div style="display: flex; align-items: center; gap: 8px">
+            <img
+              id="finalImagePreview"
+              class="image-preview hidden"
+              alt="preview"
+            />
+            <button
+              class="image-clear hidden"
+              id="finalImageClear"
+              onclick="clearFinalImage()"
+            >
+              ✕ Remove
+            </button>
+          </div>
+        </div>
+      </div>
 
-    <!-- Final Jeopardy -->
-    <div class="setup-section">
-      <h2>Final Jeopardy</h2>
-      <div class="form-row">
+      <!-- Game Rules -->
+      <div class="setup-section">
+        <h2>Game Rules</h2>
+        <p style="color: var(--tan); font-size: 0.82rem; margin-bottom: 10px">
+          Write your house rules here. The host can display them on the audience
+          screen at any time during the game.
+        </p>
         <div class="form-group">
-          <label>Category Name</label>
-          <input type="text" id="finalCategory" placeholder="e.g. World History" maxlength="60">
-        </div>
-      </div>
-      <div class="form-row">
-        <div class="form-group">
-          <label>Question</label>
-          <textarea id="finalQuestion" placeholder="Enter the Final Jeopardy question..." rows="3"></textarea>
-        </div>
-      </div>
-      <div class="form-row">
-        <div class="form-group">
-          <label>Answer</label>
-          <textarea id="finalAnswer" placeholder="Enter the answer..." rows="2"></textarea>
-        </div>
-      </div>
-      <div class="form-row">
-        <div class="form-group" style="max-width:260px">
-          <label>Image (optional)</label>
-          <input type="file" id="finalImage" accept="image/*" onchange="handleFinalImage(event)" style="color:var(--tan)">
-        </div>
-        <div style="display:flex;align-items:center;gap:8px">
-          <img id="finalImagePreview" class="image-preview hidden" alt="preview">
-          <button class="image-clear hidden" id="finalImageClear" onclick="clearFinalImage()">✕ Remove</button>
+          <textarea
+            id="gameRules"
+            rows="8"
+            placeholder="e.g. Answer in the form of a question&#10;No phones during the game&#10;Host's decision is final&#10;Each contestant selects one question per round"
+          ></textarea>
         </div>
       </div>
     </div>
+    <!-- end setup-container -->
 
-    <!-- Game Rules -->
-    <div class="setup-section">
-      <h2>Game Rules</h2>
-      <p style="color:var(--tan);font-size:0.82rem;margin-bottom:10px">
-        Write your house rules here. The host can display them on the audience screen at any time during the game.
-      </p>
-      <div class="form-group">
-        <textarea id="gameRules" rows="8"
-          placeholder="e.g. Answer in the form of a question&#10;No phones during the game&#10;Host's decision is final&#10;Each contestant selects one question per round"></textarea>
-      </div>
+    <div class="setup-actions">
+      <button class="btn btn-secondary" onclick="location.href = 'index.html'">
+        ← Back
+      </button>
+      <button class="btn btn-secondary" onclick="loadFromFile()">
+        📂 Load JSON
+      </button>
+      <input
+        type="file"
+        id="importFileInput"
+        accept=".json"
+        class="hidden"
+        onchange="importJSON(event)"
+      />
+      <button class="btn btn-secondary" onclick="saveToFile()">
+        💾 Save JSON
+      </button>
+      <button class="btn btn-primary" onclick="startGame()">
+        ▶ Start Game
+      </button>
     </div>
 
-  </div><!-- end setup-container -->
-
-  <div class="setup-actions">
-    <button class="btn btn-secondary" onclick="location.href='index.html'">← Back</button>
-    <button class="btn btn-secondary" onclick="loadFromFile()">📂 Load JSON</button>
-    <input type="file" id="importFileInput" accept=".json" class="hidden" onchange="importJSON(event)">
-    <button class="btn btn-secondary" onclick="saveToFile()">💾 Save JSON</button>
-    <button class="btn btn-primary" onclick="startGame()">▶ Start Game</button>
-  </div>
-
-  <script src="js/setup.js"></script>
-</body>
+    <script src="js/setup.js"></script>
+  </body>
 </html>

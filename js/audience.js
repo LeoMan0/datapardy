@@ -21,7 +21,7 @@ function applyScene(scene) {
 
   switch (scene.view) {
     case 'board':
-      renderBoard(scene.game);
+      renderBoard(scene.game, scene.page || 0);
       show('scene-board');
       break;
 
@@ -81,11 +81,18 @@ function applyScene(scene) {
 }
 
 // ===== BOARD RENDER =====
-function renderBoard(gameData) {
+const AUD_CATS_PER_PAGE = 5;
+
+function renderBoard(gameData, page) {
   if (!gameData) return;
   const board = document.getElementById('audienceBoard');
-  const cats = gameData.categories;
-  if (!cats || !cats.length) return;
+  const allCats = gameData.categories;
+  if (!allCats || !allCats.length) return;
+
+  const totalPages = Math.max(1, Math.ceil(allCats.length / AUD_CATS_PER_PAGE));
+  const curPage = Math.max(0, Math.min(page || 0, totalPages - 1));
+  const start = curPage * AUD_CATS_PER_PAGE;
+  const cats = allCats.slice(start, start + AUD_CATS_PER_PAGE);
 
   board.style.gridTemplateColumns = `repeat(${cats.length}, 1fr)`;
   board.innerHTML = '';
@@ -115,6 +122,17 @@ function renderBoard(gameData) {
       }
       board.appendChild(cell);
     });
+  }
+
+  // Page indicator
+  const nav = document.getElementById('audiencePageNav');
+  if (nav) {
+    if (totalPages > 1) {
+      nav.classList.remove('hidden');
+      nav.textContent = `Page ${curPage + 1} of ${totalPages}`;
+    } else {
+      nav.classList.add('hidden');
+    }
   }
 
   renderScoreStrip('audienceScoreStrip', gameData.players);

@@ -11,7 +11,7 @@ function broadcast(scene) {
 channel.onmessage = (e) => {
   if (e.data.type === 'sync_request') {
     if (currentScene) broadcast(currentScene);
-    else if (gameData) broadcast({ view: 'board', game: gameData });
+    else if (gameData) broadcast({ view: 'board', game: gameData, page: currentPage });
   }
 };
 
@@ -21,6 +21,8 @@ let currentQuestion = null; // { ci, qi, q }
 let currentDDWager = 0;
 let currentDDPlayerIndex = -1;
 let anyContestantScoredPositive = false; // tracks host scoring for current question
+const CATS_PER_PAGE = 5;
+let currentPage = 0;
 
 // ===== INIT =====
 window.addEventListener('DOMContentLoaded', () => {
@@ -47,7 +49,7 @@ window.addEventListener('DOMContentLoaded', () => {
   document.getElementById('gameTitle').textContent = gameData.title || 'DataPardy';
   renderBoard();
   renderScores();
-  broadcast({ view: 'board', game: gameData });
+  broadcast({ view: 'board', game: gameData, page: currentPage });
 });
 
 document.addEventListener('keydown', e => {
@@ -55,15 +57,32 @@ document.addEventListener('keydown', e => {
 });
 
 // ===== BOARD =====
+function getTotalPages() {
+  return Math.max(1, Math.ceil(gameData.categories.length / CATS_PER_PAGE));
+}
+
+function getPageCategories() {
+  const start = currentPage * CATS_PER_PAGE;
+  return gameData.categories.slice(start, start + CATS_PER_PAGE);
+}
+
 function renderBoard() {
   const board = document.getElementById('board');
-  const cats = gameData.categories;
+  const allCats = gameData.categories;
+  const totalPages = getTotalPages();
 
-  board.style.gridTemplateColumns = `repeat(${cats.length}, 1fr)`;
+  // Clamp page
+  if (currentPage >= totalPages) currentPage = totalPages - 1;
+  if (currentPage < 0) currentPage = 0;
+
+  const start = currentPage * CATS_PER_PAGE;
+  const pageCats = getPageCategories();
+
+  board.style.gridTemplateColumns = `repeat(${pageCats.length}, 1fr)`;
   board.innerHTML = '';
 
   // Row 0: category headers
-  cats.forEach(cat => {
+  pageCats.forEach(cat => {
     const cell = document.createElement('div');
     cell.className = 'board-cell category-header-cell';
     cell.textContent = cat.name || '—';
@@ -71,9 +90,10 @@ function renderBoard() {
   });
 
   // Question rows
-  const maxQ = Math.max(...cats.map(c => c.questions.length));
+  const maxQ = Math.max(...pageCats.map(c => c.questions.length));
   for (let qi = 0; qi < maxQ; qi++) {
-    cats.forEach((cat, ci) => {
+    pageCats.forEach((cat, localCi) => {
+      const ci = start + localCi; // real index into gameData.categories
       const cell = document.createElement('div');
       cell.className = 'board-cell value-cell';
       const q = cat.questions[qi];
@@ -94,6 +114,40 @@ function renderBoard() {
       }
       board.appendChild(cell);
     });
+  }
+
+  renderPageNav();
+}
+
+function renderPageNav() {
+  const totalPages = getTotalPages();
+  const nav = document.getElementById('boardPageNav');
+  if (!nav) return;
+
+  if (totalPages <= 1) {
+    nav.classList.add('hidden');
+    return;
+  }
+
+  nav.classList.remove('hidden');
+  document.getElementById('pagePrev').disabled = currentPage === 0;
+  document.getElementById('pageNext').disabled = currentPage >= totalPages - 1;
+  document.getElementById('pageIndicator').textContent = `${currentPage + 1} / ${totalPages}`;
+}
+
+function prevPage() {
+  if (currentPage > 0) {
+    currentPage--;
+    renderBoard();
+    broadcast({ view: 'board', game: gameData, page: currentPage });
+  }
+}
+
+function nextPage() {
+  if (currentPage < getTotalPages() - 1) {
+    currentPage++;
+    renderBoard();
+    broadcast({ view: 'board', game: gameData, page: currentPage });
   }
 }
 
@@ -321,7 +375,7 @@ function pauseQuestion() {
   currentDDPlayerIndex = -1;
   anyContestantScoredPositive = false;
   document.getElementById('modalOverlay').classList.add('hidden');
-  broadcast({ view: 'board', game: gameData });
+  broadcast({ view: 'board', game: gameData, page: currentPage });
 }
 
 function closeModal(markAnswered) {
@@ -339,7 +393,7 @@ function closeModal(markAnswered) {
   currentDDPlayerIndex = -1;
   anyContestantScoredPositive = false;
   document.getElementById('modalOverlay').classList.add('hidden');
-  broadcast({ view: 'board', game: gameData });
+  broadcast({ view: 'board', game: gameData, page: currentPage });
 }
 
 function handleOverlayClick(e) {

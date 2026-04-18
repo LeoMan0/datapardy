@@ -1,6 +1,6 @@
 // ===== STATE =====
 const DEFAULT_POINT_VALUES = [200, 400, 600, 800, 1000];
-const MAX_CATEGORIES = 6;
+const MAX_CATEGORIES = Infinity;
 const MAX_PLAYERS = 6;
 const MAX_QUESTIONS = 5;
 
