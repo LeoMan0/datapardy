@@ -249,11 +249,12 @@ function handleQuestionImage(event, ci, qi) {
   const file = event.target.files[0];
   if (!file) return;
   const reader = new FileReader();
-  reader.onload = function(e) {
-    gameData.categories[ci].questions[qi].image = e.target.result;
+  reader.onload = async function(e) {
+    const compressed = await compressImage(e.target.result);
+    gameData.categories[ci].questions[qi].image = compressed;
     const img = document.getElementById(`qimg-${ci}-${qi}`);
     const clr = document.getElementById(`qclear-${ci}-${qi}`);
-    img.src = e.target.result;
+    img.src = compressed;
     img.classList.remove('hidden');
     clr.classList.remove('hidden');
   };
@@ -273,11 +274,12 @@ function handleAnswerImage(event, ci, qi) {
   const file = event.target.files[0];
   if (!file) return;
   const reader = new FileReader();
-  reader.onload = function(e) {
-    gameData.categories[ci].questions[qi].answerImage = e.target.result;
+  reader.onload = async function(e) {
+    const compressed = await compressImage(e.target.result);
+    gameData.categories[ci].questions[qi].answerImage = compressed;
     const img = document.getElementById(`qaimg-${ci}-${qi}`);
     const clr = document.getElementById(`qaclear-${ci}-${qi}`);
-    img.src = e.target.result;
+    img.src = compressed;
     img.classList.remove('hidden');
     clr.classList.remove('hidden');
   };
@@ -310,9 +312,10 @@ function handleFinalImage(event) {
   const file = event.target.files[0];
   if (!file) return;
   const reader = new FileReader();
-  reader.onload = function(e) {
-    gameData.finalJeopardy.image = e.target.result;
-    document.getElementById('finalImagePreview').src = e.target.result;
+  reader.onload = async function(e) {
+    const compressed = await compressImage(e.target.result);
+    gameData.finalJeopardy.image = compressed;
+    document.getElementById('finalImagePreview').src = compressed;
     document.getElementById('finalImagePreview').classList.remove('hidden');
     document.getElementById('finalImageClear').classList.remove('hidden');
   };
@@ -388,10 +391,11 @@ function importJSON(event) {
   const file = event.target.files[0];
   if (!file) return;
   const reader = new FileReader();
-  reader.onload = function(e) {
+  reader.onload = async function(e) {
     try {
       const data = JSON.parse(e.target.result);
       if (!data.categories || !Array.isArray(data.categories)) throw new Error('Invalid file');
+      await compressGameImages(data);
       gameData = data;
       renderAll();
     } catch (err) {

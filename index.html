@@ -34,18 +34,20 @@
     <div id="loadError" class="hidden" style="color:#f88; font-size:0.9rem;"></div>
   </main>
 
+  <script src="js/utils.js"></script>
   <script>
     function loadGame(event) {
       const file = event.target.files[0];
       if (!file) return;
       const reader = new FileReader();
-      reader.onload = function(e) {
+      reader.onload = async function(e) {
         try {
           const data = JSON.parse(e.target.result);
           // Basic validation
           if (!data.categories || !Array.isArray(data.categories)) {
             throw new Error('Invalid game file format');
           }
+          await compressGameImages(data);
           localStorage.setItem('datapardy_game', JSON.stringify(data));
           location.href = 'setup.html?loaded=1';
         } catch (err) {
