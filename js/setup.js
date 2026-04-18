@@ -137,6 +137,8 @@ function renderQuestionRow(q, ci, qi) {
 
   const imgSrc = q.image ? q.image : '';
   const hasImg = !!q.image;
+  const aImgSrc = q.answerImage ? q.answerImage : '';
+  const hasAImg = !!q.answerImage;
 
   row.innerHTML = `
     <div class="question-row-header">
@@ -175,6 +177,17 @@ function renderQuestionRow(q, ci, qi) {
         src="${escHtml(imgSrc)}" alt="preview">
       <button class="image-clear ${hasImg ? '' : 'hidden'}" id="qclear-${ci}-${qi}"
         onclick="clearQuestionImage(${ci},${qi})">✕ Remove</button>
+    </div>
+    <div class="form-row" style="align-items:center">
+      <div class="form-group" style="max-width:240px">
+        <label>Answer Image (optional)</label>
+        <input type="file" accept="image/*" style="color:var(--tan)"
+          onchange="handleAnswerImage(event,${ci},${qi})">
+      </div>
+      <img id="qaimg-${ci}-${qi}" class="image-preview ${hasAImg ? '' : 'hidden'}"
+        src="${escHtml(aImgSrc)}" alt="answer preview">
+      <button class="image-clear ${hasAImg ? '' : 'hidden'}" id="qaclear-${ci}-${qi}"
+        onclick="clearAnswerImage(${ci},${qi})">✕ Remove</button>
     </div>
   `;
 
@@ -220,7 +233,7 @@ function removeQuestion(ci, qi) {
 }
 
 function newQuestion(points) {
-  return { question: '', answer: '', points: points || 200, image: null, isDailyDouble: false, answered: false, inProgress: false };
+  return { question: '', answer: '', points: points || 200, image: null, answerImage: null, isDailyDouble: false, answered: false, inProgress: false };
 }
 
 function updateQuestion(ci, qi, field, value) {
@@ -251,6 +264,30 @@ function clearQuestionImage(ci, qi) {
   gameData.categories[ci].questions[qi].image = null;
   const img = document.getElementById(`qimg-${ci}-${qi}`);
   const clr = document.getElementById(`qclear-${ci}-${qi}`);
+  img.src = '';
+  img.classList.add('hidden');
+  clr.classList.add('hidden');
+}
+
+function handleAnswerImage(event, ci, qi) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    gameData.categories[ci].questions[qi].answerImage = e.target.result;
+    const img = document.getElementById(`qaimg-${ci}-${qi}`);
+    const clr = document.getElementById(`qaclear-${ci}-${qi}`);
+    img.src = e.target.result;
+    img.classList.remove('hidden');
+    clr.classList.remove('hidden');
+  };
+  reader.readAsDataURL(file);
+}
+
+function clearAnswerImage(ci, qi) {
+  gameData.categories[ci].questions[qi].answerImage = null;
+  const img = document.getElementById(`qaimg-${ci}-${qi}`);
+  const clr = document.getElementById(`qaclear-${ci}-${qi}`);
   img.src = '';
   img.classList.add('hidden');
   clr.classList.add('hidden');

@@ -156,6 +156,7 @@ function renderAnswer(scene) {
   document.getElementById('aText').textContent = scene.question || '';
   document.getElementById('aAnswer').textContent = scene.answer || '';
   setImage('aImage', scene.image);
+  setImage('aAnswerImage', scene.answerImage);
 }
 
 // ===== SCORE STRIPS =====

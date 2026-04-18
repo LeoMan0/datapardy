@@ -284,6 +284,15 @@ function showQuestionSection(q, categoryName) {
     imgEl.classList.add('hidden');
   }
 
+  const ansImgEl = document.getElementById('modalAnswerImage');
+  if (q.answerImage) {
+    ansImgEl.src = q.answerImage;
+    ansImgEl.classList.remove('hidden');
+  } else {
+    ansImgEl.src = '';
+    ansImgEl.classList.add('hidden');
+  }
+
   document.getElementById('modalQuestion').textContent = q.question || '(no question text)';
   renderModalScoreButtons();
 
@@ -293,6 +302,7 @@ function showQuestionSection(q, categoryName) {
     points: q.points,
     question: q.question || '',
     image: q.image || null,
+    answerImage: q.answerImage || null,
     isDailyDouble: q.isDailyDouble,
     wager: currentDDWager,
     game: gameData
@@ -358,6 +368,7 @@ function revealAnswer() {
     question: q.question || '',
     answer: q.answer || '',
     image: q.image || null,
+    answerImage: q.answerImage || null,
     isDailyDouble: q.isDailyDouble,
     wager: currentDDWager,
     game: gameData
